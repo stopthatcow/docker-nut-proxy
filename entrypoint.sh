@@ -6,6 +6,14 @@ cat <<EOF > /etc/nut/nut.conf
 MODE=netclient
 EOF
 
+# Generate dummy/repeater driver entry in ups.conf to satisfy upsd startup check
+cat <<EOF > /etc/nut/ups.conf
+[${UPS_NAME}]
+    driver = dummy-ups
+    port = ${UPS_NAME}@${UPSTREAM_HOST}:${UPSTREAM_PORT}
+    desc = "Upstream NUT Proxy"
+EOF
+
 # Generate upsmon.conf (Monitor upstream server)
 cat <<EOF > /etc/nut/upsmon.conf
 MONITOR ${UPS_NAME}@${UPSTREAM_HOST}:${UPSTREAM_PORT} 1 ${UPSTREAM_USER} ${UPSTREAM_PASS} slave
