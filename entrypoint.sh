@@ -5,11 +5,12 @@ set -e
 UPSTREAM_HOST="${UPSTREAM_HOST:-192.168.1.100}"
 UPSTREAM_PORT="${UPSTREAM_PORT:-3493}"
 UPSTREAM_UPS_NAME="${UPSTREAM_UPS_NAME:-ups}"
-UPSTREAM_USER="${UPSTREAM_USER:-monuser}"
+UPSTREAM_USER="${UPSTREAM_USER:-ups}"
 UPSTREAM_PASS="${UPSTREAM_PASS:-secret}"
 
 LOCAL_UPS_NAME="${LOCAL_UPS_NAME:-ups}"
-CLIENT_USER="${CLIENT_USER:-clientuser}"
+LOCAL_PORT="${LOCAL_PORT:-3493}"
+CLIENT_USER="${CLIENT_USER:-ups}"
 CLIENT_PASS="${CLIENT_PASS:-clientpass}"
 
 # Suppress "sh: wall: not found" warning in Alpine
@@ -43,9 +44,9 @@ DEADTIME 15
 POWERDOWNFLAG /etc/killpower
 EOF
 
-# Listen on port 3493 for local clients
+# Listen on configurable LOCAL_PORT for local clients
 cat <<EOF > /etc/nut/upsd.conf
-LISTEN 0.0.0.0 3493
+LISTEN 0.0.0.0 ${LOCAL_PORT}
 EOF
 
 # Client authentication settings
@@ -64,7 +65,7 @@ chmod 640 /etc/nut/*.conf /etc/nut/upsd.users
 echo "Starting NUT drivers..."
 upsdrvctl -u nut start || true
 
-echo "Starting NUT daemon..."
+echo "Starting NUT daemon on port ${LOCAL_PORT}..."
 upsd -u nut
 
 echo "Monitoring upstream: ${UPSTREAM_UPS_NAME}@${UPSTREAM_HOST}:${UPSTREAM_PORT}"
