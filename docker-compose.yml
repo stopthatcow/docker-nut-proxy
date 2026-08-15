@@ -4,30 +4,25 @@ services:
   nut-proxy:
     build:
       context: .
-      # Optional: Override base image/package versions during build
       args:
-        ALPINE_VERSION: latest
-        NUT_VERSION: ""
+        ALPINE_VERSION: ${ALPINE_VERSION:-latest}
+        NUT_VERSION: ${NUT_VERSION:-}
     image: nut-proxy:latest
     container_name: nut-proxy
     restart: unless-stopped
     ports:
       - "3493:3493"
     environment:
-      # Upstream NUT Server Details
-      - UPSTREAM_UPS_NAME
       - UPSTREAM_HOST
+      - UPSTREAM_PORT
+      - UPSTREAM_UPS_NAME
       - UPSTREAM_USER
       - UPSTREAM_PASS
-
-      # Downstream Client Authentication
       - LOCAL_UPS_NAME
       - CLIENT_USER
       - CLIENT_PASS
-
-    # Verify upsd daemon is responding to queries
     healthcheck:
-      test: ["CMD", "upsc", "myups@127.0.0.1:3493"]
+      test: ["CMD-SHELL", "upsc ${LOCAL_UPS_NAME:-ups}@127.0.0.1:3493 || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 3
