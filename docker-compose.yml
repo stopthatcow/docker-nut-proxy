@@ -15,11 +15,13 @@ services:
       - "3493:3493"
     environment:
       # Upstream NUT Server Details
+      - UPSTREAM_UPS_NAME
       - UPSTREAM_HOST
       - UPSTREAM_USER
       - UPSTREAM_PASS
 
       # Downstream Client Authentication
+      - LOCAL_UPS_NAME
       - CLIENT_USER
       - CLIENT_PASS
 
